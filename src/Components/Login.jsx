@@ -1,56 +1,73 @@
 import React, { useState } from "react";
 import axios from "axios";
 import Dashboard from "./Dashboard";
-// import CircularProgress from "@mui/material/CircularProgress";
-import { TextField, Button, Grid, Switch } from "@mui/material";
+import {
+	TextField,
+	Button,
+	Grid,
+	Switch,
+	Snackbar,
+	CircularProgress,
+} from "@mui/material";
+import IconButton from "@mui/material/IconButton";
+import CloseIcon from "@mui/icons-material/Close";
 
 const Login = () => {
 	// Login state
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [checked, setChecked] = useState(true);
-	const [loader, setLoader] = useState(false);
+	const [loader, setLoader] = useState();
 	const [loggedInData, setLoggedInData] = useState();
 	const [orgViewReq, setOrgViewReq] = useState({});
+	const [open, setOpen] = useState(false);
 	// Date Range state
-	const [dateRange, setDateRange] = useState();
+	const [dateRange, setDateRange] = useState({});
 
 	const handleChangeSwitch = () => {
 		setChecked(!checked);
 	};
 
 	const handleSubmit = () => {
-		console.log(email + " " + password + " " + checked);
 		login();
 	};
 	const login = async () => {
-		setLoader(false);
-		const sUrl = "/sigmoid/signIn";
+		let validRegex =
+			/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+		if (email.match(validRegex)) {
+			setLoader(false);
+			const sUrl = "/sigmoid/signIn";
 
-		// let oPayload = {
-		// 	email: "candidate@sigmoid.com",
-		// 	password: "Sigmoid#123",
-		// 	rememberMe: true,
-		// };
-		let oPayload = {
-			email: email,
-			password: password,
-			rememberMe: checked,
-		};
-		await axios({
-			method: "POST",
-			url: sUrl,
-			data: oPayload,
-		})
-			.then((res) => res.data)
-			.then((data) => {
-				setLoggedInData(data);
-				setLoader(true);
-				fetchDateRange(data.token);
+			// let oPayload = {
+			// 	email: "candidate@sigmoid.com",
+			// 	password: "Sigmoid#123",
+			// 	rememberMe: true,
+			// };
+			let oPayload = {
+				email: email,
+				password: password,
+				rememberMe: checked,
+			};
+			await axios({
+				method: "POST",
+				url: sUrl,
+				data: oPayload,
 			})
-			.catch((err) => {
-				console.log(err);
-			});
+				.then((res) => res.data)
+				.then((data) => {
+					setLoggedInData(data);
+					setLoader(true);
+					fetchDateRange(data.token);
+				})
+				.catch((err) => {
+					console.log(err);
+				});
+		} else {
+			setOpen(true);
+		}
+	};
+	const handleClose = () => {
+		setOpen(false);
 	};
 	const fetchDateRange = async (token) => {
 		const sUrl = "/sigmoid/api/v1/getDateRange";
@@ -72,14 +89,39 @@ const Login = () => {
 		})
 			.then((res) => res.data)
 			.then((data) => {
-				console.log(data);
 				setDateRange(data.result);
 			})
 			.catch((err) => {
 				console.log(err);
 			});
 	};
-
+	const action = (
+		<React.Fragment>
+			<IconButton
+				size='small'
+				aria-label='close'
+				color='inherit'
+				onClick={handleClose}
+			>
+				<CloseIcon fontSize='small' />
+			</IconButton>
+		</React.Fragment>
+	);
+	let dashBoard;
+	if (loader === undefined) {
+		dashBoard = null;
+	} else if (loader && Object.keys(dateRange).length === 0) {
+		dashBoard = <CircularProgress />;
+	} else if (loader && loggedInData && dateRange) {
+		dashBoard = (
+			<Dashboard
+				orgViewReq={orgViewReq}
+				email={email}
+				loggedInData={loggedInData}
+				dateRange={dateRange}
+			/>
+		);
+	}
 	return (
 		<div>
 			{!loader && (
@@ -127,15 +169,16 @@ const Login = () => {
 					</Grid>
 				</div>
 			)}
-
-			{loader && loggedInData && dateRange ? (
-				<Dashboard
-					orgViewReq={orgViewReq}
-					email={email}
-					loggedInData={loggedInData}
-					dateRange={dateRange}
+			{dashBoard}
+			{open && (
+				<Snackbar
+					open={open}
+					autoHideDuration={3000}
+					onClose={handleClose}
+					message='Invalid Email'
+					action={action}
 				/>
-			) : null}
+			)}
 		</div>
 	);
 };

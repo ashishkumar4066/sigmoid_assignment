@@ -20,33 +20,35 @@ const Dashboard = ({ orgViewReq, email, loggedInData, dateRange }) => {
 		setLoginData(loggedInData);
 	}, [loggedInData]);
 
-	// Date Range state
-	const [range, setRange] = useState({});
 	const [selectionRange, setSelectionRange] = useState({});
 	useEffect(() => {
-		console.log(dateRange);
-		setRange(dateRange);
 		let selectionRange = {
 			startDate: new Date(parseInt(dateRange.startDate)),
 			endDate: new Date(parseInt(dateRange.endDate)),
 			key: "selection",
 		};
-		console.log(selectionRange);
 		setSelectionRange(selectionRange);
 	}, [dateRange]);
 
 	const handleSelect = (ranges) => {
 		console.log(ranges);
+		setSelectionRange(ranges.selection);
 	};
 	const handleClickViewDashboard = () => {
 		console.log(selectionRange);
-		fetchTreeData();
-		fetchBarData();
-		fetchPieData();
+		let parsedDate = {
+			startDate: Date.parse(selectionRange.startDate).toString(),
+			endDate: Date.parse(selectionRange.endDate).toString(),
+		};
+		console.log(parsedDate);
+		fetchTreeData(parsedDate);
+		fetchBarData(parsedDate);
+		fetchPieData(parsedDate);
 	};
-	const fetchTreeData = async () => {
-		const sUrl = "/sigmoid/api/v1/getData";
+	const fetchTreeData = async (parsedDate) => {
+		console.log(parsedDate);
 
+		const sUrl = "/sigmoid/api/v1/getData";
 		let oPayload = {
 			_id: "dashboard1516252439345",
 			emailId: email,
@@ -64,7 +66,7 @@ const Dashboard = ({ orgViewReq, email, loggedInData, dateRange }) => {
 						name: "UTC (+00:00)",
 						location: "UTC",
 					},
-					dateRange: range,
+					dateRange: parsedDate,
 					xAxis: ["D044"],
 					yAxis: ["M002"],
 					approxCountDistinct: [],
@@ -94,14 +96,13 @@ const Dashboard = ({ orgViewReq, email, loggedInData, dateRange }) => {
 		})
 			.then((res) => res.data)
 			.then((data) => {
-				console.log(data);
 				setTable(data.result.data);
 			})
 			.catch((err) => {
 				console.log(err);
 			});
 	};
-	const fetchBarData = async () => {
+	const fetchBarData = async (parsedDate) => {
 		const sUrl = "/sigmoid/api/v1/getData";
 
 		let oPayload = {
@@ -121,7 +122,7 @@ const Dashboard = ({ orgViewReq, email, loggedInData, dateRange }) => {
 						name: "UTC (+00:00)",
 						location: "UTC",
 					},
-					dateRange: range,
+					dateRange: parsedDate,
 					xAxis: ["D017"],
 					yAxis: ["M002"],
 					approxCountDistinct: [],
@@ -151,14 +152,13 @@ const Dashboard = ({ orgViewReq, email, loggedInData, dateRange }) => {
 		})
 			.then((res) => res.data)
 			.then((data) => {
-				console.log(data.result.data);
 				setBar(data.result.data);
 			})
 			.catch((err) => {
 				console.log(err);
 			});
 	};
-	const fetchPieData = async () => {
+	const fetchPieData = async (parsedDate) => {
 		const sUrl = "/sigmoid/api/v1/getData";
 
 		let oPayload = {
@@ -179,7 +179,7 @@ const Dashboard = ({ orgViewReq, email, loggedInData, dateRange }) => {
 						name: "UTC (+00:00)",
 						location: "UTC",
 					},
-					dateRange: range,
+					dateRange: parsedDate,
 					xAxis: ["D005"],
 					yAxis: [],
 					approxCountDistinct: [],
@@ -233,7 +233,8 @@ const Dashboard = ({ orgViewReq, email, loggedInData, dateRange }) => {
 				<Grid item>
 					{Object.keys(selectionRange).length > 0 && (
 						<DateRangePicker
-							editableDateInputs={true}
+							minDate={new Date(parseInt(dateRange.startDate))}
+							maxDate={new Date(parseInt(dateRange.endDate))}
 							ranges={[selectionRange]}
 							onChange={(item) => handleSelect(item)}
 						/>

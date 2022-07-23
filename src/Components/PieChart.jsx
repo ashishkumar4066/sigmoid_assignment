@@ -40,7 +40,7 @@ const PieChart = ({ pie, bar, table }) => {
 			labels: pie.map((p) => p.advertiserId),
 			datasets: [
 				{
-					label: "# of Votes",
+					label: "Pie Chart",
 					data: pie.map((p) => p.CM001_percent),
 					backgroundColor: [
 						"rgba(255, 99, 132, 0.2)",
@@ -71,7 +71,7 @@ const PieChart = ({ pie, bar, table }) => {
 			labels: bar.map((b) => b.appSiteId),
 			datasets: [
 				{
-					label: "Bar Representation",
+					label: "Bar Chart",
 					data: bar.map((b) => b.impressions_offered),
 					backgroundColor: [
 						"rgba(255, 99, 132, 0.2)",
@@ -104,17 +104,17 @@ const PieChart = ({ pie, bar, table }) => {
 			<Grid
 				container
 				direction='row'
-				justifyContent='center'
+				justifyContent='space-around'
 				alignItems='center'
 				spacing={3}
 			>
-				<Grid item md={6}>
+				<Grid item md={4}>
 					{pieContent && pieContent.length > 0 && <Pie data={pieData} />}
 				</Grid>
-				<Grid item md={6}>
+				<Grid item md={4}>
 					{barContent && barContent.length > 0 && <Bar data={barData} />}
 				</Grid>
-				<Grid item>
+				<Grid item md={4}>
 					{tableData && tableData.length > 0 && (
 						<TableData tableData={tableData} />
 					)}
@@ -128,7 +128,10 @@ export default PieChart;
 
 export const TableData = ({ tableData }) => {
 	return (
-		<TableContainer component={Paper}>
+		<TableContainer
+			sx={{ height: "400px", overflow: "auto" }}
+			component={Paper}
+		>
 			<Table>
 				<TableHead>
 					<TableRow>
