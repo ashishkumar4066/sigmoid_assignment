@@ -2,7 +2,9 @@ import React, { useState, useEffect } from "react";
 import "react-date-range/dist/styles.css"; // main style file
 import "react-date-range/dist/theme/default.css";
 import { DateRangePicker } from "react-date-range";
-import { Button, Grid } from "@mui/material";
+import { Button, Grid, Snackbar } from "@mui/material";
+import IconButton from "@mui/material/IconButton";
+import CloseIcon from "@mui/icons-material/Close";
 import axios from "axios";
 import PieChart from "./PieChart";
 
@@ -20,6 +22,9 @@ const Dashboard = ({ orgViewReq, email, loggedInData, dateRange }) => {
 	const [pieLoader, setPieLoader] = useState(false);
 	const [barLoader, setBarLoader] = useState(false);
 	const [treeLoader, setTreeLoader] = useState(false);
+
+	const [open, setOpen] = useState(false);
+
 	useEffect(() => {
 		setLoginData(loggedInData);
 	}, [loggedInData]);
@@ -40,14 +45,25 @@ const Dashboard = ({ orgViewReq, email, loggedInData, dateRange }) => {
 	};
 	const handleClickViewDashboard = () => {
 		console.log(selectionRange);
-		let parsedDate = {
-			startDate: Date.parse(selectionRange.startDate).toString(),
-			endDate: Date.parse(selectionRange.endDate).toString(),
-		};
-		console.log(parsedDate);
-		fetchTreeData(parsedDate);
-		fetchBarData(parsedDate);
-		fetchPieData(parsedDate);
+		if (
+			Date.parse(selectionRange.startDate).toString() ===
+			Date.parse(selectionRange.endDate).toString()
+		) {
+			console.log("Same date range");
+			setOpen(true);
+			setPie([]);
+			setBar([]);
+			setTable([]);
+		} else {
+			let parsedDate = {
+				startDate: Date.parse(selectionRange.startDate).toString(),
+				endDate: Date.parse(selectionRange.endDate).toString(),
+			};
+			console.log(parsedDate);
+			fetchTreeData(parsedDate);
+			fetchBarData(parsedDate);
+			fetchPieData(parsedDate);
+		}
 	};
 	const fetchTreeData = async (parsedDate) => {
 		setTreeLoader(false);
@@ -240,9 +256,24 @@ const Dashboard = ({ orgViewReq, email, loggedInData, dateRange }) => {
 				console.log(err);
 			});
 	};
+	const handleClose = () => {
+		setOpen(false);
+	};
+	const action = (
+		<React.Fragment>
+			<IconButton
+				size='small'
+				aria-label='close'
+				color='inherit'
+				onClick={handleClose}
+			>
+				<CloseIcon fontSize='small' />
+			</IconButton>
+		</React.Fragment>
+	);
 
 	return (
-		<div>
+		<div style={{ marginTop: "20px", marginBottom: "20px" }}>
 			<Grid
 				container
 				direction='column'
@@ -257,6 +288,7 @@ const Dashboard = ({ orgViewReq, email, loggedInData, dateRange }) => {
 							maxDate={new Date(parseInt(dateRange.endDate))}
 							ranges={[selectionRange]}
 							onChange={(item) => handleSelect(item)}
+							rangeColors={["#9c27b0"]}
 						/>
 					)}
 				</Grid>
@@ -270,6 +302,15 @@ const Dashboard = ({ orgViewReq, email, loggedInData, dateRange }) => {
 					</Button>
 				</Grid>
 			</Grid>
+			{open && (
+				<Snackbar
+					open={open}
+					autoHideDuration={3000}
+					onClose={handleClose}
+					message='Invalid date range'
+					action={action}
+				/>
+			)}
 			{pie && pie.length > 0 && bar && bar.length > 0 && (
 				<PieChart
 					barLoader={barLoader}

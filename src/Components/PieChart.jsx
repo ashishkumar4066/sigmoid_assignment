@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { CircularProgress, Grid } from "@mui/material";
+import { CircularProgress, Grid, Typography } from "@mui/material";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -121,25 +121,34 @@ const PieChart = ({ pieLoader, barLoader, treeLoader, pie, bar, table }) => {
 				spacing={3}
 			>
 				<Grid item md={6}>
-					{loaderPie ? (
-						<Pie data={pieData} />
-					) : (
-						<CircularProgress color='secondary' />
-					)}
+					<Paper sx={{ padding: "10px" }} elevation={6}>
+						<Typography mb={1}>Pie Chart</Typography>
+						{loaderPie ? (
+							<Pie data={pieData} />
+						) : (
+							<CircularProgress color='secondary' />
+						)}
+					</Paper>
 				</Grid>
 				<Grid item md={6}>
-					{loaderBar ? (
-						<Bar data={barData} />
-					) : (
-						<CircularProgress color='secondary' />
-					)}
+					<Paper sx={{ padding: "10px" }} elevation={6}>
+						<Typography mb={1}>Bar Chart</Typography>
+						{loaderBar ? (
+							<Bar data={barData} />
+						) : (
+							<CircularProgress color='secondary' />
+						)}
+					</Paper>
 				</Grid>
 				<Grid item md={6}>
-					{loaderTree ? (
-						<TableData tableData={tableData} />
-					) : (
-						<CircularProgress color='secondary' />
-					)}
+					<Paper sx={{ padding: "10px" }} elevation={6}>
+						<Typography mb={1}>Tree</Typography>
+						{loaderTree ? (
+							<TableData tableData={tableData} />
+						) : (
+							<CircularProgress color='secondary' />
+						)}
+					</Paper>
 				</Grid>
 			</Grid>
 		</div>
@@ -153,12 +162,20 @@ export const TableData = ({ tableData }) => {
 		<TableContainer
 			sx={{ height: "400px", overflow: "auto" }}
 			component={Paper}
+			elevation={4}
 		>
 			<Table>
 				<TableHead>
-					<TableRow>
-						<TableCell>Publisher ID</TableCell>
-						<TableCell align='right'>Impressions Offered</TableCell>
+					<TableRow sx={{ background: "#9c27b0" }}>
+						<TableCell sx={{ color: "white", fontWeight: "bold" }}>
+							Publisher ID
+						</TableCell>
+						<TableCell
+							sx={{ color: "white", fontWeight: "bold" }}
+							align='right'
+						>
+							Impressions Offered
+						</TableCell>
 					</TableRow>
 				</TableHead>
 				<TableBody>

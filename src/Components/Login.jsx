@@ -65,6 +65,7 @@ const Login = () => {
 				})
 				.catch((err) => {
 					console.log(err);
+					setOpen(true);
 				});
 		} else {
 			setOpen(true);
@@ -163,6 +164,7 @@ const Login = () => {
 								checked={checked}
 								onChange={handleChangeSwitch}
 								inputProps={{ "aria-label": "controlled" }}
+								color='secondary'
 							/>
 						</Grid>
 						<Grid item>
@@ -183,7 +185,7 @@ const Login = () => {
 					open={open}
 					autoHideDuration={3000}
 					onClose={handleClose}
-					message='Invalid Email'
+					message='Invalid Credentials'
 					action={action}
 				/>
 			)}
