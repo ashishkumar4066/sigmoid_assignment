@@ -23,7 +23,7 @@ const Login = () => {
 	const [open, setOpen] = useState(false);
 	// Date Range state
 	const [dateRange, setDateRange] = useState({});
-
+	console.log(process.env);
 	const handleChangeSwitch = () => {
 		setChecked(!checked);
 	};
@@ -36,8 +36,13 @@ const Login = () => {
 			/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
 		if (email.match(validRegex)) {
 			setLoader(false);
-			const sUrl = "/sigmoid/signIn";
+			let sUrl = "/sigmoid/signIn";
 
+			let splitUrl = sUrl.split("/");
+			sUrl = sUrl.replace(
+				"/" + splitUrl[1],
+				process.env["REACT_APP_" + splitUrl[1]]
+			);
 			// let oPayload = {
 			// 	email: "candidate@sigmoid.com",
 			// 	password: "Sigmoid#123",
@@ -70,8 +75,12 @@ const Login = () => {
 		setOpen(false);
 	};
 	const fetchDateRange = async (token) => {
-		const sUrl = "/sigmoid/api/v1/getDateRange";
-
+		let sUrl = "/sigmoid/api/v1/getDateRange";
+		let splitUrl = sUrl.split("/");
+		sUrl = sUrl.replace(
+			"/" + splitUrl[1],
+			process.env["REACT_APP_" + splitUrl[1]]
+		);
 		let oPayload = {
 			organization: "DemoTest",
 			view: "Auction",

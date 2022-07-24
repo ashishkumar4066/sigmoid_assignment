@@ -48,7 +48,12 @@ const Dashboard = ({ orgViewReq, email, loggedInData, dateRange }) => {
 	const fetchTreeData = async (parsedDate) => {
 		console.log(parsedDate);
 
-		const sUrl = "/sigmoid/api/v1/getData";
+		let sUrl = "/sigmoid/api/v1/getData";
+		let splitUrl = sUrl.split("/");
+		sUrl = sUrl.replace(
+			"/" + splitUrl[1],
+			process.env["REACT_APP_" + splitUrl[1]]
+		);
 		let oPayload = {
 			_id: "dashboard1516252439345",
 			emailId: email,
@@ -103,8 +108,12 @@ const Dashboard = ({ orgViewReq, email, loggedInData, dateRange }) => {
 			});
 	};
 	const fetchBarData = async (parsedDate) => {
-		const sUrl = "/sigmoid/api/v1/getData";
-
+		let sUrl = "/sigmoid/api/v1/getData";
+		let splitUrl = sUrl.split("/");
+		sUrl = sUrl.replace(
+			"/" + splitUrl[1],
+			process.env["REACT_APP_" + splitUrl[1]]
+		);
 		let oPayload = {
 			_id: "dashboard1516252235693",
 			emailId: email,
@@ -159,8 +168,12 @@ const Dashboard = ({ orgViewReq, email, loggedInData, dateRange }) => {
 			});
 	};
 	const fetchPieData = async (parsedDate) => {
-		const sUrl = "/sigmoid/api/v1/getData";
-
+		let sUrl = "/sigmoid/api/v1/getData";
+		let splitUrl = sUrl.split("/");
+		sUrl = sUrl.replace(
+			"/" + splitUrl[1],
+			process.env["REACT_APP_" + splitUrl[1]]
+		);
 		let oPayload = {
 			_id: "Datastory_ChartId_1535224664111",
 			emailId: email,
