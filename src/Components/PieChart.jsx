@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Grid } from "@mui/material";
+import { CircularProgress, Grid } from "@mui/material";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -28,14 +28,27 @@ ChartJS.register(
 	Tooltip,
 	Legend
 );
-const PieChart = ({ pie, bar, table }) => {
-	const [pieContent, setPieContent] = useState([]);
+const PieChart = ({ pieLoader, barLoader, treeLoader, pie, bar, table }) => {
 	const [pieData, setPieData] = useState({});
-	const [barContent, setBarContent] = useState([]);
 	const [barData, setBarData] = useState({});
 	const [tableData, setTableData] = useState([]);
+	// Loader for charts
+	const [loaderPie, setLoaderPie] = useState();
+	const [loaderBar, setLoaderBar] = useState();
+	const [loaderTree, setLoaderTree] = useState();
+
 	useEffect(() => {
-		setPieContent(pie);
+		console.log(pieLoader);
+		setLoaderPie(pieLoader);
+	}, [pieLoader]);
+	useEffect(() => {
+		setLoaderBar(barLoader);
+	}, [barLoader]);
+	useEffect(() => {
+		setLoaderTree(treeLoader);
+	}, [treeLoader]);
+
+	useEffect(() => {
 		let data = {
 			labels: pie.map((p) => p.advertiserId),
 			datasets: [
@@ -66,7 +79,6 @@ const PieChart = ({ pie, bar, table }) => {
 	}, [pie]);
 
 	useEffect(() => {
-		setBarContent(bar);
 		let data = {
 			labels: bar.map((b) => b.appSiteId),
 			datasets: [
@@ -100,7 +112,7 @@ const PieChart = ({ pie, bar, table }) => {
 	}, [table]);
 
 	return (
-		<div>
+		<div style={{ margin: "0 10%", marginTop: "20px" }}>
 			<Grid
 				container
 				direction='row'
@@ -108,15 +120,25 @@ const PieChart = ({ pie, bar, table }) => {
 				alignItems='center'
 				spacing={3}
 			>
-				<Grid item md={4}>
-					{pieContent && pieContent.length > 0 && <Pie data={pieData} />}
+				<Grid item md={6}>
+					{loaderPie ? (
+						<Pie data={pieData} />
+					) : (
+						<CircularProgress color='secondary' />
+					)}
 				</Grid>
-				<Grid item md={4}>
-					{barContent && barContent.length > 0 && <Bar data={barData} />}
+				<Grid item md={6}>
+					{loaderBar ? (
+						<Bar data={barData} />
+					) : (
+						<CircularProgress color='secondary' />
+					)}
 				</Grid>
-				<Grid item md={4}>
-					{tableData && tableData.length > 0 && (
+				<Grid item md={6}>
+					{loaderTree ? (
 						<TableData tableData={tableData} />
+					) : (
+						<CircularProgress color='secondary' />
 					)}
 				</Grid>
 			</Grid>

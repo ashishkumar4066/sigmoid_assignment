@@ -23,7 +23,6 @@ const Login = () => {
 	const [open, setOpen] = useState(false);
 	// Date Range state
 	const [dateRange, setDateRange] = useState({});
-	console.log(process.env);
 	const handleChangeSwitch = () => {
 		setChecked(!checked);
 	};
@@ -120,7 +119,7 @@ const Login = () => {
 	if (loader === undefined) {
 		dashBoard = null;
 	} else if (loader && Object.keys(dateRange).length === 0) {
-		dashBoard = <CircularProgress />;
+		dashBoard = <CircularProgress color='secondary' />;
 	} else if (loader && loggedInData && dateRange) {
 		dashBoard = (
 			<Dashboard

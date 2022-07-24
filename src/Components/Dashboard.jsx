@@ -15,8 +15,12 @@ const Dashboard = ({ orgViewReq, email, loggedInData, dateRange }) => {
 	const [pie, setPie] = useState([]);
 	// logged in state
 	const [loginData, setLoginData] = useState({});
+
+	//Loader for Pie
+	const [pieLoader, setPieLoader] = useState(false);
+	const [barLoader, setBarLoader] = useState(false);
+	const [treeLoader, setTreeLoader] = useState(false);
 	useEffect(() => {
-		console.log(loggedInData);
 		setLoginData(loggedInData);
 	}, [loggedInData]);
 
@@ -46,8 +50,7 @@ const Dashboard = ({ orgViewReq, email, loggedInData, dateRange }) => {
 		fetchPieData(parsedDate);
 	};
 	const fetchTreeData = async (parsedDate) => {
-		console.log(parsedDate);
-
+		setTreeLoader(false);
 		let sUrl = "/sigmoid/api/v1/getData";
 		let splitUrl = sUrl.split("/");
 		sUrl = sUrl.replace(
@@ -102,12 +105,14 @@ const Dashboard = ({ orgViewReq, email, loggedInData, dateRange }) => {
 			.then((res) => res.data)
 			.then((data) => {
 				setTable(data.result.data);
+				setTreeLoader(true);
 			})
 			.catch((err) => {
 				console.log(err);
 			});
 	};
 	const fetchBarData = async (parsedDate) => {
+		setBarLoader(false);
 		let sUrl = "/sigmoid/api/v1/getData";
 		let splitUrl = sUrl.split("/");
 		sUrl = sUrl.replace(
@@ -162,12 +167,14 @@ const Dashboard = ({ orgViewReq, email, loggedInData, dateRange }) => {
 			.then((res) => res.data)
 			.then((data) => {
 				setBar(data.result.data);
+				setBarLoader(true);
 			})
 			.catch((err) => {
 				console.log(err);
 			});
 	};
 	const fetchPieData = async (parsedDate) => {
+		setPieLoader(false);
 		let sUrl = "/sigmoid/api/v1/getData";
 		let splitUrl = sUrl.split("/");
 		sUrl = sUrl.replace(
@@ -226,8 +233,8 @@ const Dashboard = ({ orgViewReq, email, loggedInData, dateRange }) => {
 		})
 			.then((res) => res.data)
 			.then((data) => {
-				console.log(data.result.data);
 				setPie(data.result.data);
+				setPieLoader(true);
 			})
 			.catch((err) => {
 				console.log(err);
@@ -264,7 +271,14 @@ const Dashboard = ({ orgViewReq, email, loggedInData, dateRange }) => {
 				</Grid>
 			</Grid>
 			{pie && pie.length > 0 && bar && bar.length > 0 && (
-				<PieChart pie={pie} bar={bar} table={table} />
+				<PieChart
+					barLoader={barLoader}
+					treeLoader={treeLoader}
+					pieLoader={pieLoader}
+					pie={pie}
+					bar={bar}
+					table={table}
+				/>
 			)}
 		</div>
 	);
