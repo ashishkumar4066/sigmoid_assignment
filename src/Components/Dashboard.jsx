@@ -2,12 +2,42 @@ import React, { useState, useEffect } from "react";
 import "react-date-range/dist/styles.css"; // main style file
 import "react-date-range/dist/theme/default.css";
 import { DateRangePicker } from "react-date-range";
-import { Button, Grid, Snackbar } from "@mui/material";
+import { Button, Grid, Paper, Snackbar } from "@mui/material";
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
 import axios from "axios";
-import PieChart from "./PieChart";
+// import PieChart from "./PieChart";
 import { useSelector } from "react-redux";
+
+//
+import { CircularProgress, Typography } from "@mui/material";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import { Pie, Bar } from "react-chartjs-2";
+import {
+	Chart as ChartJS,
+	CategoryScale,
+	LinearScale,
+	BarElement,
+	ArcElement,
+	Title,
+	Tooltip,
+	Legend,
+} from "chart.js";
+
+ChartJS.register(
+	ArcElement,
+	CategoryScale,
+	LinearScale,
+	BarElement,
+	Title,
+	Tooltip,
+	Legend
+);
 
 const Dashboard = ({ dateRange }) => {
 	const reducerState = useSelector((state) => state.reducer);
@@ -19,9 +49,9 @@ const Dashboard = ({ dateRange }) => {
 	const [pie, setPie] = useState([]);
 
 	//Loader for Pie
-	const [pieLoader, setPieLoader] = useState(false);
-	const [barLoader, setBarLoader] = useState(false);
-	const [treeLoader, setTreeLoader] = useState(false);
+	const [pieLoader, setPieLoader] = useState(null);
+	const [barLoader, setBarLoader] = useState(null);
+	const [tableLoader, setTableLoader] = useState(null);
 
 	const [open, setOpen] = useState(false);
 
@@ -50,6 +80,9 @@ const Dashboard = ({ dateRange }) => {
 			setPie([]);
 			setBar([]);
 			setTable([]);
+			setPieLoader(null);
+			setBarLoader(null);
+			setTableLoader(null);
 		} else {
 			let parsedDate = {
 				startDate: Date.parse(selectionRange.startDate).toString(),
@@ -62,7 +95,7 @@ const Dashboard = ({ dateRange }) => {
 		}
 	};
 	const fetchTreeData = async (parsedDate) => {
-		setTreeLoader(false);
+		setTableLoader(false);
 		let sUrl = "/sigmoid/api/v1/getData";
 		let splitUrl = sUrl.split("/");
 		sUrl = sUrl.replace(
@@ -117,7 +150,7 @@ const Dashboard = ({ dateRange }) => {
 			.then((res) => res.data)
 			.then((data) => {
 				setTable(data.result.data);
-				setTreeLoader(true);
+				setTableLoader(true);
 			})
 			.catch((err) => {
 				console.log(err);
@@ -267,7 +300,100 @@ const Dashboard = ({ dateRange }) => {
 			</IconButton>
 		</React.Fragment>
 	);
-
+	// Pie Content
+	let pieContent;
+	if (pieLoader === null) {
+		pieContent = null;
+	} else if (pieLoader) {
+		let data = {
+			labels: pie.map((p) => p.advertiserId),
+			datasets: [
+				{
+					label: "Pie Chart",
+					data: pie.map((p) => p.CM001_percent),
+					backgroundColor: [
+						"rgba(255, 99, 132, 0.2)",
+						"rgba(54, 162, 235, 0.2)",
+						"rgba(255, 206, 86, 0.2)",
+						"rgba(75, 192, 192, 0.2)",
+						"rgba(153, 102, 255, 0.2)",
+						"rgba(255, 159, 64, 0.2)",
+					],
+					borderColor: [
+						"rgba(255, 99, 132, 1)",
+						"rgba(54, 162, 235, 1)",
+						"rgba(255, 206, 86, 1)",
+						"rgba(75, 192, 192, 1)",
+						"rgba(153, 102, 255, 1)",
+						"rgba(255, 159, 64, 1)",
+					],
+					borderWidth: 1,
+				},
+			],
+		};
+		pieContent = (
+			<Paper sx={{ padding: "10px" }} elevation={6}>
+				<Typography mb={1}>Pie Chart</Typography>
+				<Pie data={data} />
+			</Paper>
+		);
+	} else {
+		pieContent = <CircularProgress color='secondary' />;
+	}
+	// Bar Content
+	let barContent;
+	if (barLoader === null) {
+		barContent = null;
+	} else if (barLoader) {
+		let data = {
+			labels: bar.map((b) => b.appSiteId),
+			datasets: [
+				{
+					label: "Bar Graph",
+					data: bar.map((b) => b.impressions_offered),
+					backgroundColor: [
+						"rgba(255, 99, 132, 0.2)",
+						"rgba(54, 162, 235, 0.2)",
+						"rgba(255, 206, 86, 0.2)",
+						"rgba(75, 192, 192, 0.2)",
+						"rgba(153, 102, 255, 0.2)",
+						"rgba(255, 159, 64, 0.2)",
+					],
+					borderColor: [
+						"rgba(255, 99, 132, 1)",
+						"rgba(54, 162, 235, 1)",
+						"rgba(255, 206, 86, 1)",
+						"rgba(75, 192, 192, 1)",
+						"rgba(153, 102, 255, 1)",
+						"rgba(255, 159, 64, 1)",
+					],
+					borderWidth: 1,
+				},
+			],
+		};
+		barContent = (
+			<Paper sx={{ padding: "10px" }} elevation={6}>
+				<Typography mb={1}>Bar Graph</Typography>
+				<Bar data={data} />
+			</Paper>
+		);
+	} else {
+		barContent = <CircularProgress color='secondary' />;
+	}
+	// Table Content
+	let tableContent;
+	if (tableLoader === null) {
+		tableContent = null;
+	} else if (tableLoader) {
+		tableContent = (
+			<Paper sx={{ padding: "10px" }} elevation={6}>
+				<Typography mb={1}>Table Representation</Typography>
+				<TableData tableData={table} />
+			</Paper>
+		);
+	} else {
+		tableContent = <CircularProgress color='secondary' />;
+	}
 	return (
 		<div style={{ marginTop: "20px", marginBottom: "20px" }}>
 			<Grid
@@ -279,13 +405,15 @@ const Dashboard = ({ dateRange }) => {
 			>
 				<Grid item>
 					{Object.keys(selectionRange).length > 0 && (
-						<DateRangePicker
-							minDate={new Date(parseInt(dateRange.startDate))}
-							maxDate={new Date(parseInt(dateRange.endDate))}
-							ranges={[selectionRange]}
-							onChange={(item) => handleSelect(item)}
-							rangeColors={["#9c27b0"]}
-						/>
+						<Paper elevation={4}>
+							<DateRangePicker
+								minDate={new Date(parseInt(dateRange.startDate))}
+								maxDate={new Date(parseInt(dateRange.endDate))}
+								ranges={[selectionRange]}
+								onChange={(item) => handleSelect(item)}
+								rangeColors={["#9c27b0"]}
+							/>
+						</Paper>
 					)}
 				</Grid>
 				<Grid item>
@@ -308,18 +436,66 @@ const Dashboard = ({ dateRange }) => {
 				/>
 			)}
 
-			{pie && pie.length > 0 && bar && bar.length > 0 && (
-				<PieChart
-					barLoader={barLoader}
-					treeLoader={treeLoader}
-					pieLoader={pieLoader}
-					pie={pie}
-					bar={bar}
-					table={table}
-				/>
-			)}
+			{/* Charts */}
+			<div style={{ margin: "0 10%", marginTop: "20px" }}>
+				<Grid
+					container
+					direction='row'
+					justifyContent='space-around'
+					alignItems='center'
+					spacing={3}
+				>
+					<Grid item md={6}>
+						{pieContent}
+					</Grid>
+					<Grid item md={6}>
+						{barContent}
+					</Grid>
+					<Grid item md={6}>
+						{tableContent}
+					</Grid>
+				</Grid>
+			</div>
 		</div>
 	);
 };
 
 export default Dashboard;
+export const TableData = ({ tableData }) => {
+	return (
+		<TableContainer
+			sx={{ height: "400px", overflow: "auto" }}
+			component={Paper}
+			elevation={4}
+		>
+			<Table>
+				<TableHead>
+					<TableRow sx={{ background: "#9c27b0" }}>
+						<TableCell sx={{ color: "white", fontWeight: "bold" }}>
+							Publisher ID
+						</TableCell>
+						<TableCell
+							sx={{ color: "white", fontWeight: "bold" }}
+							align='right'
+						>
+							Impressions Offered
+						</TableCell>
+					</TableRow>
+				</TableHead>
+				<TableBody>
+					{tableData.map((value, index) => (
+						<TableRow
+							key={index}
+							sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+						>
+							<TableCell component='th' scope='row'>
+								{value.publisherId}
+							</TableCell>
+							<TableCell align='right'>{value.impressions_offered}</TableCell>
+						</TableRow>
+					))}
+				</TableBody>
+			</Table>
+		</TableContainer>
+	);
+};
