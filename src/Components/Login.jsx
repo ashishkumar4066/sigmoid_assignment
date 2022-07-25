@@ -11,15 +11,20 @@ import {
 } from "@mui/material";
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
+import { useDispatch } from "react-redux";
+import { setEmailId, setLogInData, setOrgViewReq } from "../redux/reducer";
 
 const Login = () => {
+	// Reducer
+
+	const dispatch = useDispatch();
+
 	// Login state
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [checked, setChecked] = useState(true);
 	const [loader, setLoader] = useState();
 	const [loggedInData, setLoggedInData] = useState();
-	const [orgViewReq, setOrgViewReq] = useState({});
 	const [open, setOpen] = useState(false);
 	// Date Range state
 	const [dateRange, setDateRange] = useState({});
@@ -34,6 +39,7 @@ const Login = () => {
 		let validRegex =
 			/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
 		if (email.match(validRegex)) {
+			dispatch(setEmailId(email));
 			setLoader(false);
 			let sUrl = "/sigmoid/signIn";
 
@@ -60,6 +66,7 @@ const Login = () => {
 				.then((res) => res.data)
 				.then((data) => {
 					setLoggedInData(data);
+					dispatch(setLogInData(data));
 					setLoader(true);
 					fetchDateRange(data.token);
 				})
@@ -85,7 +92,7 @@ const Login = () => {
 			organization: "DemoTest",
 			view: "Auction",
 		};
-		setOrgViewReq(oPayload);
+		dispatch(setOrgViewReq(oPayload));
 		let oHeaders = {
 			"x-auth-token": token,
 		};
@@ -122,14 +129,7 @@ const Login = () => {
 	} else if (loader && Object.keys(dateRange).length === 0) {
 		dashBoard = <CircularProgress color='secondary' />;
 	} else if (loader && loggedInData && dateRange) {
-		dashBoard = (
-			<Dashboard
-				orgViewReq={orgViewReq}
-				email={email}
-				loggedInData={loggedInData}
-				dateRange={dateRange}
-			/>
-		);
+		dashBoard = <Dashboard dateRange={dateRange} />;
 	}
 	return (
 		<div>

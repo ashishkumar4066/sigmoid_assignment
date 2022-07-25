@@ -7,16 +7,16 @@ import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
 import axios from "axios";
 import PieChart from "./PieChart";
+import { useSelector } from "react-redux";
 
-const Dashboard = ({ orgViewReq, email, loggedInData, dateRange }) => {
+const Dashboard = ({ dateRange }) => {
+	const reducerState = useSelector((state) => state.reducer);
 	// Set Table Data
 	const [table, setTable] = useState([]);
 	// Set Bar Data
 	const [bar, setBar] = useState([]);
 	// Set Pie Data
 	const [pie, setPie] = useState([]);
-	// logged in state
-	const [loginData, setLoginData] = useState({});
 
 	//Loader for Pie
 	const [pieLoader, setPieLoader] = useState(false);
@@ -24,10 +24,6 @@ const Dashboard = ({ orgViewReq, email, loggedInData, dateRange }) => {
 	const [treeLoader, setTreeLoader] = useState(false);
 
 	const [open, setOpen] = useState(false);
-
-	useEffect(() => {
-		setLoginData(loggedInData);
-	}, [loggedInData]);
 
 	const [selectionRange, setSelectionRange] = useState({});
 	useEffect(() => {
@@ -75,8 +71,8 @@ const Dashboard = ({ orgViewReq, email, loggedInData, dateRange }) => {
 		);
 		let oPayload = {
 			_id: "dashboard1516252439345",
-			emailId: email,
-			orgViewReq: orgViewReq,
+			emailId: reducerState.email,
+			orgViewReq: reducerState.orgViewReq,
 			chartObject: {
 				metadata: {
 					title: "chartobject:1516252439345",
@@ -109,7 +105,7 @@ const Dashboard = ({ orgViewReq, email, loggedInData, dateRange }) => {
 			},
 		};
 		let oHeaders = {
-			"x-auth-token": loginData.token,
+			"x-auth-token": reducerState.logInData.token,
 		};
 
 		await axios({
@@ -137,8 +133,8 @@ const Dashboard = ({ orgViewReq, email, loggedInData, dateRange }) => {
 		);
 		let oPayload = {
 			_id: "dashboard1516252235693",
-			emailId: email,
-			orgViewReq: orgViewReq,
+			emailId: reducerState.email,
+			orgViewReq: reducerState.orgViewReq,
 			chartObject: {
 				metadata: {
 					title: "chartobject:1516252235693",
@@ -171,7 +167,7 @@ const Dashboard = ({ orgViewReq, email, loggedInData, dateRange }) => {
 			},
 		};
 		let oHeaders = {
-			"x-auth-token": loginData.token,
+			"x-auth-token": reducerState.logInData.token,
 		};
 
 		await axios({
@@ -199,8 +195,8 @@ const Dashboard = ({ orgViewReq, email, loggedInData, dateRange }) => {
 		);
 		let oPayload = {
 			_id: "Datastory_ChartId_1535224664111",
-			emailId: email,
-			orgViewReq: orgViewReq,
+			emailId: reducerState.email,
+			orgViewReq: reducerState.orgViewReq,
 			chartObject: {
 				metadata: {
 					title: "",
@@ -238,7 +234,7 @@ const Dashboard = ({ orgViewReq, email, loggedInData, dateRange }) => {
 			},
 		};
 		let oHeaders = {
-			"x-auth-token": loginData.token,
+			"x-auth-token": reducerState.logInData.token,
 		};
 
 		await axios({
@@ -311,6 +307,7 @@ const Dashboard = ({ orgViewReq, email, loggedInData, dateRange }) => {
 					action={action}
 				/>
 			)}
+
 			{pie && pie.length > 0 && bar && bar.length > 0 && (
 				<PieChart
 					barLoader={barLoader}

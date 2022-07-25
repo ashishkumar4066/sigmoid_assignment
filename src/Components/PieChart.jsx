@@ -29,6 +29,8 @@ ChartJS.register(
 	Legend
 );
 const PieChart = ({ pieLoader, barLoader, treeLoader, pie, bar, table }) => {
+	// Selector
+
 	const [pieData, setPieData] = useState({});
 	const [barData, setBarData] = useState({});
 	const [tableData, setTableData] = useState([]);
@@ -123,11 +125,16 @@ const PieChart = ({ pieLoader, barLoader, treeLoader, pie, bar, table }) => {
 				<Grid item md={6}>
 					<Paper sx={{ padding: "10px" }} elevation={6}>
 						<Typography mb={1}>Pie Chart</Typography>
-						{loaderPie ? (
+						{loaderPie === undefined ? null : loaderPie && pie.length > 0 ? (
 							<Pie data={pieData} />
 						) : (
 							<CircularProgress color='secondary' />
 						)}
+						{/* {loaderPie ? (
+							<Pie data={pieData} />
+						) : (
+							<CircularProgress color='secondary' />
+						)} */}
 					</Paper>
 				</Grid>
 				<Grid item md={6}>
